@@ -1,66 +1,62 @@
-class Employee
+package emp.assignment;
+import java.util.Scanner;
+abstract class Employee
 {
-	String name,designation;
-	int age,salary;
-	Employee(String n,int a)
+	private String name;
+	private String designation;
+	private int age;
+	private int salary;
+	static int count;
+	Employee(int age,String designation)
 	{
-		name=n;
-		age=a;
+		this.salary=salary;
+		this.designation=designation;
+		Scanner sc=new Scanner(System.in);
+		name=sc.nextLine();
+		System.out.print("Enter age:");
+		age=sc.nextInt();
+		count++;
 	}
 	public void raiseSalary()
 	{
+		Scanner sc=new Scanner(System.in);
+		System.out.print("Enter the amount to be raised for "+name+":");
+		int s=sc.nextInt();
+		salary=salary+s;	
 	}
-	public void display()
+	public final void display()
 	{
 		System.out.println("Name:"+name+" Age:"+age+" Salary:"+salary+" Designation:"+designation);
 	}
 }
-class Tester extends Employee
+final class Tester extends Employee
 {
-	Tester(String name,int age)
+	Tester()
 	{
-		super(name,age);
-		salary=30000;
-		designation="Tester";
-	}
-	public void raiseSalary()
-	{
-		salary=salary+2000;
+		super(15000,"Tester");
 	}
 }
-class Programmer extends Employee
+final class Programmer extends Employee
 {
-	Programmer(String name,int age)
+	Programmer()
 	{
-		super(name,age);
-		salary=40000;
-		designation="Programmer";
-	}
-	public void raiseSalary()
-	{
-		salary=salary+5000;
+		super(30000,"Programmer");
 	}
 }
-class Manager extends Employee
+final class Manager extends Employee
 {
-	Manager(String name,int age)
+	Manager()
 	{
-		super(name,age);
-		salary=50000;
-		designation="Manager";
-	}
-	public void raiseSalary()
-	{
-		salary=salary+10000;
+		super(90000,"Manager");
 	}
 }
 public class EmployeeAssign
 {
 	public static void main(String args[])
 	{
-		Employee e1=new Tester("Ravi",25);
-		Employee e2=new Programmer("Sujith",35);
-		Employee e3=new Manager("Kiran",45);
+		Employee e1=new Tester();
+		Employee e2=new Programmer();
+		Employee e3=new Manager();
 		e1.display();
 		e2.display();
 		e3.display();
