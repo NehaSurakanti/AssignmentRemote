@@ -6,15 +6,15 @@ abstract class Employee
 	private String designation;
 	private int age;
 	private int salary;
-	static int count;
-	Employee(int age,String designation)
+	static int count=0;
+	Employee(int age,String designation) throws InvalidAgeException,InputMismatchException
 	{
 		this.salary=salary;
 		this.designation=designation;
 		Scanner sc=new Scanner(System.in);
+		System.out.println("Enter name for "+designation);
 		name=sc.nextLine();
-		System.out.print("Enter age:");
-		age=sc.nextInt();
+		age=InvalidAgeException.readAge();
 		count++;
 	}
 	public void raiseSalary()
@@ -50,12 +50,49 @@ final class Manager extends Employee
 		super(90000,"Manager");
 	}
 }
+class InvalidAgeException extends RuntimeException
+{
+	public InvalidAgeException()
+	{
+	}
+	public InvalidAgeException(String msg)
+	{
+		super(msg);
+	}
+	public static int readAge()
+	{
+		int age=0;
+		while(true)
+		{
+			Scanner sc=new Scanner(System.in);
+			System.out.println("Enter age:");
+			try
+			{
+				age=sc.nextInt();
+				if(age<21 || age>60)
+					throw new InvalidAgeException();
+				return age;
+			}
+			catch(InputMismatchException e)
+			{
+				System.out.println("Please enter number only");
+			}
+			catch(InvalidAgeException e)
+			{
+				System.out.println("Please enter the age between 21 and 60");
+			}
+		}
+	}
+}
 public class EmployeeAssign
 {
 	public static void main(String args[])
 	{
+		System.out.println("Enter Tester details:")
 		Employee e1=new Tester();
+		System.out.println("Enter Programmer details:")
 		Employee e2=new Programmer();
+		System.out.println("Enter Manager details:")
 		Employee e3=new Manager();
 		e1.display();
 		e2.display();
