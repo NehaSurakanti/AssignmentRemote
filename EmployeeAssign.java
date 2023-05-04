@@ -1,5 +1,6 @@
 package emp.assignment;
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 abstract class Employee
 {
 	private String name;
@@ -7,7 +8,7 @@ abstract class Employee
 	private int age;
 	private int salary;
 	static int count=0;
-	Employee(int age,String designation) throws InvalidAgeException,InputMismatchException
+	Employee(int age,String designation)
 	{
 		this.salary=salary;
 		this.designation=designation;
@@ -88,11 +89,11 @@ public class EmployeeAssign
 {
 	public static void main(String args[])
 	{
-		System.out.println("Enter Tester details:")
+		System.out.println("Enter Tester details:");
 		Employee e1=new Tester();
-		System.out.println("Enter Programmer details:")
+		System.out.println("Enter Programmer details:");
 		Employee e2=new Programmer();
-		System.out.println("Enter Manager details:")
+		System.out.println("Enter Manager details:");
 		Employee e3=new Manager();
 		e1.display();
 		e2.display();
