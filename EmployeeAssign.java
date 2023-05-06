@@ -8,7 +8,7 @@ abstract class Employee
 	private int age;
 	private int salary;
 	static int count=0;
-	Employee(int age,String designation)
+	Employee(int salary,String designation)
 	{
 		this.salary=salary;
 		this.designation=designation;
