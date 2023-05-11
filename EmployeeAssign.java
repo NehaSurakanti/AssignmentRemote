@@ -1,13 +1,14 @@
 package emp.assignment;
 import java.util.*;
 import java.io.*;
-abstract class Employee
+abstract class Employee implements Serializable
 {
 	private String name;
 	private String designation;
 	private int age;
 	private int salary;
 	static int count=0;
+	static ArrayList<Employee>list;
 	Employee(int salary,String designation)
 	{
 		this.salary=salary;
@@ -16,58 +17,52 @@ abstract class Employee
 		System.out.println("Enter name for "+designation);
 		name=sc.nextLine();
 		age=InvalidAgeException.readAge();
-		writeToFile();
+		list.add(this);
 		count++;
 	}
-	public void raiseSalary()
+	public String toString()
 	{
-		Scanner sc=new Scanner(System.in);
-		System.out.print("Enter the amount to be raised for "+name+":");
-		int s=sc.nextInt();
+		display();
+		return "";
+	}
+	public void raiseSalary(int s)
+	{
 		salary=salary+s;	
 	}
 	public final void display()
 	{
 		System.out.println("Name:"+name+" Age:"+age+" Salary:"+salary+" Designation:"+designation);
 	}
-
-	public static void readFromFile()
+	public abstract void raisesalary();
+	public static void serialize()
 	{
 		try
 		{
-			File f=new File("D:/Target/Assignments/employee/employees.csv");
-			BufferedReader fr=new BufferedReader(new FileReader("D:/Target/Assignments/AssignmentLocal/employee/employees.csv"));
-			String line=null;
-			System.out.println();
-			while((line=fr.readLine())!=null)
-			{
-				StringTokenizer st=new StringTokenizer(line,",");
-				int tokens=st.countTokens();
-				System.out.println("Name:"+st.nextToken());
-				System.out.println("Age:"+st.nextToken());
-				System.out.println("Salary:"+st.nextToken());
-				System.out.println("Designation:"+st.nextToken());
-				System.out.println("-----------------------");						
-			}
-			fr.close();
+			ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream("employees.ser"));
+			oos.writeObject(list);
+			oos.close();
 		}
 		catch(Exception e)
 		{
 			System.out.println(e);
 		}
+
 	}
-	public void writeToFile()
+	public static void deserialize()
 	{
 		try
 		{
-			File dir1=new File("employee");
-			dir1.mkdir();
-			File f=new File(dir1,"employees.csv");
-			f.createNewFile();
-			PrintWriter pw=new PrintWriter(new FileOutputStream(f,true));
-			pw.write(name+","+age+","+salary+","+designation+"\n");
-			pw.flush();
-			pw.close();
+			File f=new File("employees.ser");
+			if(f.exists())
+			{
+				ObjectInputStream ois=new ObjectInputStream(new FileInputStream(f));
+				list=(ArrayList<Employee>)ois.readObject();
+				ois.close();
+			}
+			else
+			{
+				list=new ArrayList<Employee>();
+			}
 		}
 		catch(Exception e)
 		{
@@ -81,6 +76,10 @@ final class Tester extends Employee
 	{
 		super(15000,"Tester");
 	}
+	public void raisesalary()
+	{
+		super.raisesalary(2000);
+	}
 }
 final class Programmer extends Employee
 {
@@ -88,12 +87,20 @@ final class Programmer extends Employee
 	{
 		super(30000,"Programmer");
 	}
+	public void raisesalary()
+	{
+		super.raisesalary(5000);
+	}
 }
 final class Manager extends Employee
 {
 	Manager()
 	{
 		super(90000,"Manager");
+	}
+	public void raisesalary()
+	{
+		super.raisesalary(10000);
 	}
 }
 class InvalidAgeException extends RuntimeException
@@ -130,36 +137,93 @@ class InvalidAgeException extends RuntimeException
 		}
 	}
 }
+class InvalidOptionException extends RuntimeException
+{
+	public InvalidOptionException()
+	{
+	}
+	public InvalidOptionException(String msg)
+	{
+		super(msg);
+	}
+	public static int readOption()
+	{
+		int option=0;
+		while(true)
+		{
+			Scanner sc=new Scanner(System.in);
+			System.out.println("Enter Your choice:");
+			try
+			{
+				option=sc.nextInt();
+				return option;
+			}
+			catch(Exception e)
+			{
+				System.out.println("Please choose the right option from the given option only");
+			}
+		}
+	}
+}
+class EmpMenu
+{
+	public static void menu()
+	{
+		int ch1=0, ch2=0;
+		Employee.deserialize();
+		do
+		{
+			System.out.println("-------------------------");
+			System.out.println("  1.  Create  ");
+			System.out.println("  2.  Display  ");
+			System.out.println("  3.  Raise Salary  ");
+			System.out.println("  4.  Exit  ");
+			System.out.println("-------------------------");
+			ch1 = InvalidOptionException.readOption();
+			switch(ch1)
+			{
+				case 1:do
+					{
+						System.out.println("-------------------------");
+						System.out.println("  1.  Tester  ");
+						System.out.println("  2.  Programmer  ");
+						System.out.println("  3.  Manager  ");
+						System.out.println("  4.  Exit  ");
+						System.out.println("-------------------------");
+						ch2 = InvalidOptionException.readOption();
+						switch(ch2)
+						{
+							case 1 : new Tester();
+								break;
+							case 2 : new Programmer();
+								break;
+							case 3 : new Manager();
+								break;		
+							case 4 : break;
+							default : System.out.println("Please enter correct choice.....");
+						}
+					}while( ch2 != 4 );
+					break;
+				case 2:	Iterator<Employee> i1 = Employee.list.iterator();
+					while(i1.hasNext())
+						System.out.println(i1.next());
+					break;
+				case 3:Iterator<Employee> i2 = Employee.list.iterator();
+					while(i2.hasNext())
+						i2.next().raisesalary();
+					break;
+				case 4:break;
+				default : System.out.println("Please enter correct choice.....");
+			}
+		}while( ch1 != 4 );
+		Employee.serialize();
+		System.out.println("Total no. employees added : "+Employee.count);
+	}
+}
 public class EmployeeAssign
 {
 	public static void main(String args[]) throws IOException
 	{
-		BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
-		while(true)
-		{
-			System.out.println("Enter your choice:\n1.Create\n2.Display\n3.Exit");
-			int ch=Integer.parseInt(br.readLine());
-			switch(ch)
-			{
-				case 1:boolean c=true;
-					while(c)
-					{
-						System.out.println("Enter your choice:\n1.Tester\n2.Programmer\n3.Manager\n4.Exit");
-						int ch1=Integer.parseInt(br.readLine());
-						switch(ch1)
-						{
-							case 1:Employee e1=new Tester();break;
-							case 2:Employee e2=new Programmer();break;
-							case 3:Employee e3=new Manager();break;
-							case 4:c=false;break;
-							default:System.out.println("Wrong choice");
-						}
-					}break;
-				case 2:Employee.readFromFile();
-					break;
-				case 3:System.exit(0);break;
-				default:System.out.println("Wrong choice");
-			}
-		}	
+		EmpMenu.menu();	
 	}
 }
