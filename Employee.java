@@ -1,107 +1,169 @@
 import java.io.*;
 import java.sql.*;
-public class Employee
+class Emp
 {
-	public static void main(String args[])
+	private int eid;
+	private String name;
+	private int age;
+	private int salary;
+	private String desig;
+	private static Connection con = null;
+	private static Statement stmt = null;
+	static 
 	{
-		BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
 		try
 		{
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","system","tiger");
-			Statement stmt=null;
-			ResultSet rs=null;
-			PreparedStatement pstmt=null;
-			Boolean flag=true;
-			while(flag)
+			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "system", "tiger");
+			stmt = con.createStatement();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	Emp()
+	{
+		try
+		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));			
+			PreparedStatement pstmt = con.prepareStatement("insert into EMP values(?, ?, ?, ?, ?)");
+			System.out.print("Enter ID : ");
+			eid = Integer.parseInt(br.readLine());
+			System.out.print("Enter name : ");
+			name = br.readLine();
+			System.out.print("Enter age : ");
+			age = Integer.parseInt(br.readLine());
+			System.out.print("Enter salary : ");
+			salary = Integer.parseInt(br.readLine());
+			System.out.print("Enter designation : ");
+			desig = br.readLine();
+			pstmt.setInt(1, eid);
+			pstmt.setString(2, name);
+			pstmt.setInt(3, age);
+			pstmt.setInt(4, salary);
+			pstmt.setString(5, desig);
+			pstmt.execute();
+			pstmt.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	public static void display()
+	{
+		try
+		{
+			ResultSet rs = stmt.executeQuery("select * from EMP");
+			while(rs.next())
 			{
-				System.out.println("1.Create\n2.Display\n3.Raise salary\n4.Remove\n5.Exit");
-				System.out.print("Enter your choice:");
-				int ch=Integer.parseInt(br.readLine());
-				switch(ch)
-				{
-					case 1:pstmt=con.prepareStatement("insert into EMPLOYEE values(?,?,?,?,?)");
-						System.out.println("Enter EID:");
-						int eid=Integer.parseInt(br.readLine());
-						System.out.println("Enter NAME:");
-						String name=br.readLine();
-						System.out.println("Enter AGE:");
-						int age=Integer.parseInt(br.readLine());
-						System.out.println("Enter SALARY:");
-						int salary=Integer.parseInt(br.readLine());
-						System.out.println("Enter DESIGNATION:");
-						String desig=br.readLine();
-						pstmt.setInt(1,eid);
-						pstmt.setString(2,name);
-						pstmt.setInt(3,age);
-						pstmt.setInt(4,salary);
-						pstmt.setString(5,desig);
-						pstmt.execute();
-						pstmt.close();
-						break;
-					case 2:stmt=con.createStatement();
-						rs=stmt.executeQuery("select * from EMPLOYEE");
-						while(rs.next())
-						{
-							System.out.println("EID:"+rs.getInt(1));
-							System.out.println("Name:"+rs.getString(2));
-							System.out.println("Age:"+rs.getInt(3));
-							System.out.println("Salary:"+rs.getInt(4));
-							System.out.println("Designation:"+rs.getString(5));
-							System.out.println();
-						}
-						break;
-					case 3:stmt.executeUpdate("update EMPLOYEE set SALARY=SALARY+((10/100)*SALARY)");
-						System.out.println("Salary incremented");
-						break;
-					case 4:System.out.println("Enter eid:");
-						int id=Integer.parseInt(br.readLine());
-						stmt=con.createStatement();
-						int f=0;
-						rs=stmt.executeQuery("select * from EMPLOYEE");
-						while(rs.next())
-						{
-							if(rs.getInt(1)==id)
-							{
-								f=1;
-								break;
-							}
-						}
-						if(f==1)
-						{
-							System.out.println("EID:"+rs.getInt(1));
-							System.out.println("Name:"+rs.getString(2));
-							System.out.println("Age:"+rs.getInt(3));
-							System.out.println("Salary:"+rs.getInt(4));
-							System.out.println("Designation:"+rs.getString(5));
-							System.out.print("Are you sure,you want to delete the record(yes/no):");
-							String option=br.readLine();
-							if(option.equalsIgnoreCase("yes"))
-							{
-								System.out.println(id);
-								stmt.executeUpdate("delete from EMPLOYEE where EID='"+id+"'");
-								System.out.println("Record deleted successfully");
-							}
-							else if(option.equalsIgnoreCase("No"))
-								System.out.println("Removal of record cancelled");
-							else
-								System.out.println("Wrong choice");
-						}
-						else
-							System.out.println("EID does not exist");
-						break;
-					case 5:flag=false;
-						break;
-					default:System.out.println("Wrong choice");
-				}
+				System.out.println("Emp ID : "+rs.getInt(1));
+				System.out.println("Name : "+rs.getString(2));
+				System.out.println("Age : "+rs.getInt(3));
+				System.out.println("Salary : "+rs.getInt(4));
+				System.out.println("Designation : "+rs.getString(5));
+				System.out.println();
 			}
 			rs.close();
+		}
+		catch(Exception e)
+		{	
+			System.out.println(e);
+		}		
+	}
+	public static void raiseSalary()
+	{
+		try
+		{
+			stmt.executeUpdate("update EMP set SALARY = SALARY * 1.1");
+		}
+		catch(Exception e)
+		{	System.out.println(e);
+		}		
+	}
+	public static void remove()
+	{
+		try
+		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			System.out.print("Enter ID : ");
+			int id = Integer.parseInt(br.readLine());
+			ResultSet rs = stmt.executeQuery("select * from EMP where EID="+id);
+			if(rs.next())
+			{
+				System.out.println("Emp ID : "+rs.getInt(1));
+				System.out.println("Name : "+rs.getString(2));
+				System.out.println("Age : "+rs.getInt(3));
+				System.out.println("Salary : "+rs.getInt(4));
+				System.out.println("Designation : "+rs.getString(5));
+				System.out.println();
+				System.out.print("Do you really want to remove this employee record (y/n) : ");
+				String confirm = br.readLine();
+				if(confirm.equalsIgnoreCase("y"))
+					stmt.executeUpdate("delete from EMP where EID="+id);
+			}
+			else
+				System.out.println("Sorry ! Invalid Employee ID");
+			rs.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}		
+	}
+	public static void close()
+	{
+		try
+		{
 			stmt.close();
 			con.close();
 		}
 		catch(Exception e)
 		{
 			System.out.println(e);
+		}
+	}
+}
+public class Employee
+{
+	public static void main(String args[])
+	{
+		try
+		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			int ch=0;
+			do
+			{
+				System.out.println("------------------------");
+				System.out.println("  1.  Create ");
+				System.out.println("  2.  Display ");
+				System.out.println("  3.  Raise Salary ");
+				System.out.println("  4.  Remove ");
+				System.out.println("  5.  Exit ");
+				System.out.println("------------------------");
+				System.out.print("Enter choice :- ");
+				ch = Integer.parseInt(br.readLine());
+				switch(ch)
+				{
+					case 1 : new Emp();
+						break;
+					case 2 : Emp.display();
+						break;
+					case 3 : Emp.raiseSalary();
+						break;
+					case 4 : Emp.remove();
+						break;
+				}
+			}while(ch!=5);
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+		finally
+		{
+			Emp.close();
 		}
 	}
 }
